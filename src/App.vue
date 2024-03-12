@@ -1,136 +1,21 @@
 <template>
     <div class="row mt-4">
-        <div class="col">
-            <div class="mb-3">
-                <label for="width" class="form-label">Ширина:</label>
-                <input id="width" v-model="width" class="form-control" type="number">
-            </div>
-            <div class="mb-3">
-                <label for="height" class="form-label">Высота:</label>
-                <input id="height" v-model="height" class="form-control" type="number">
-            </div>
-            <div class="mb-3">
-                <label for="colors" class="form-label">Количество цветов:</label>
-                <input id="colors" v-model="numColors" class="form-control" type="number">
-            </div>
-            <div class="mb-3">
-                <label for="seed" class="form-label">Сид палитры:</label>
-                <input id="seed" v-model="seed" class="form-control" type="number">
-            </div>
-            <div v-if="width * height !== compared" class="alert alert-warning" role="alert">
-                Количество ячеек ({{ width * height }}) не совпадает с количеством цветов ({{ compared }})
-            </div>
+        <div class="col-sm-4">
+            <BaseSetting />
         </div>
-        <div class="col">
-            <div v-for="colorIndex in numColors" :key="colorIndex" class="mb-3">
-                <label :for="'pixelsPerColor-' + colorIndex" class="form-label">Количество пикселей {{ colorIndex }} цвета:</label>
-                <input :id="'pixelsPerColor-' + colorIndex" v-model="pixelsPerColor[colorIndex]" class="form-control" type="number">
-            </div>
+        <div class="col-sm-4">
+            <ColorsInput />
         </div>
-        <div class="col">
-            <canvas ref="canvas" class="img-thumbnail" :width="width * scale" :height="height * scale" />
-            <table class="table table-bordered table-sm">
-                <tbody>
-                    <tr v-for="y in height" :key="y">
-                        <td v-for="x in width" :key="x">
-                            {{ table?.[x-1]?.[y-1] ? (table?.[x-1]?.[y-1] + 1) : '1' }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="col-sm-4">
+            <ResultPalette />
         </div>
-    </div>
-
-    <div class="m-4 fixed-bottom">
-        <button class="btn btn-primary" :disabled="width * height !== compared" @click="generateImage">Сгенерировать</button>
     </div>
 </template>
 
 <script setup>
-import seedrandom from 'seedrandom'
-import convert from 'color-convert'
-import { computed, ref } from 'vue'
-
-const width = ref(1)
-const height = ref(1)
-const numColors = ref(1)
-const pixelsPerColor = ref({}) // Объект для хранения количества пикселей для каждого цвета
-
-const colors = ref([])
-const seed = ref(Math.floor(Math.random() * 10000))
-const scale = ref(20)
-const canvas = ref()
-const table = ref({})
-
-function createPalette() {
-    // Сбрасываем массив цветов
-    colors.value = []
-
-    const baseColor = generateColor()
-
-    for (let i = 0; i < numColors.value; i++) {
-        const hueShift = ((360 / numColors.value) * i) % 360
-        const color = convert.hsl.rgb((baseColor[0] + hueShift) % 255, baseColor[1], baseColor[2])
-        colors.value.push(color)
-    }
-}
-
-function generateImage() {
-    createPalette()
-    const context = canvas.value.getContext('2d')
-
-    // Очищаем канвас
-    context.clearRect(0, 0, canvas.value.width, canvas.value.height)
-    const coords = []
-
-    for (let x = 0; x < width.value; x++) {
-        for (let y = 0; y < height.value; y++) {
-            coords.push([x, y])
-        }
-    }
-
-    for (const pixelsPerColorIndex in pixelsPerColor.value) {
-        for (let colorCount = 0; colorCount < pixelsPerColor.value[pixelsPerColorIndex]; colorCount++) {
-            const color = colors.value[pixelsPerColorIndex - 1]
-
-            if (coords.length) {
-                const coordsIndex = Math.floor(Math.random() * coords.length)
-
-                const x = coords[coordsIndex][0]
-                const y = coords[coordsIndex][1]
-
-                coords.splice(coordsIndex, 1)
-
-                context.fillStyle = `rgb(${color})`
-                context.fillRect(x * scale.value, y * scale.value, scale.value, scale.value)
-
-                if (!table.value?.[x]) {
-                    table.value[x] = {}
-                }
-
-                table.value[x][y] = colors.value.indexOf(color)
-            }
-        }
-    }
-}
-function generateColor() {
-    const rng = seedrandom(seed.value)
-
-    return [
-        Math.round(rng() * 360),
-        70,
-        80,
-    ]
-}
-
-const compared = computed(() => {
-    let total = 0
-
-    for (const countIndex in pixelsPerColor.value) {
-        total = total + pixelsPerColor.value[countIndex]
-    }
-    return total
-})
+import BaseSetting from '@/components/BaseSetting.vue'
+import ColorsInput from '@/components/ColorsInput.vue'
+import ResultPalette from '@/components/ResultPalette.vue'
 
 </script>
 
