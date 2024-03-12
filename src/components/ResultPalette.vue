@@ -3,7 +3,7 @@
     <table class="table table-bordered table-sm table-condensed">
         <tbody>
             <tr v-for="y in mainStore.height" :key="y">
-                <td v-for="x in mainStore.width" :key="x" class="px-3">
+                <td v-for="x in mainStore.width" :key="x" class="px-3 text-center">
                     {{ table?.[x-1]?.[y-1] ? (table?.[x-1]?.[y-1] + 1) : '1' }}
                 </td>
             </tr>
