@@ -1,9 +1,9 @@
 <template>
     <div class="row mt-4">
-        <div class="col-sm-4">
+        <div class="col-sm-4 d-print-none">
             <BaseSetting />
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-4 d-print-none">
             <ColorsInput />
         </div>
         <div class="col-sm-4">

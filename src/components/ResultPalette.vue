@@ -1,20 +1,57 @@
 <template>
-    <canvas ref="canvas" class="img-thumbnail" :width="mainStore.width * scale" :height="mainStore.height * scale" />
-    <table class="table table-bordered table-sm table-condensed">
-        <tbody>
-            <tr v-for="y in mainStore.height" :key="y">
-                <td v-for="x in mainStore.width" :key="x" class="px-3 text-center">
-                    {{ table?.[x-1]?.[y-1] ? (table?.[x-1]?.[y-1] + 1) : '1' }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="d-none d-print-block">
+        <div>
+            <strong>Ширина</strong>: {{ mainStore.width }}
+        </div>
+        <div>
+            <strong>Высота</strong>: {{ mainStore.height }}
+        </div>
+        <div>
+            <strong>Сид палитры</strong>: {{ mainStore.seedPalette }}
+        </div>
+        <div>
+            <strong>Сид комбинации</strong>: {{ mainStore.combinationSeed }}
+        </div>
+        <div>
+            <strong>Количество цветов</strong>: {{ mainStore.numColors }}
+        </div>
+        <!-- <div class="mb-3">
+            <div v-for="(pixelPerColor, index) in mainStore.pixelsPerColor" :key="index" class="d-print-inline-block m-1">
+                <table class="table table-sm table-bordered table-condensed">
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="px-3">Цвет</th>
+                            <td class="px-3 text-center">{{ index }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="px-3">Пикселей</th>
+                            <td class="px-3 text-center">{{ pixelPerColor }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div> -->
+    </div>
 
-    <div v-if="mainStore.width * mainStore.height !== compared" class="alert alert-warning" role="alert">
+    <div class="d-print-flex align-items-start">
+        <canvas ref="canvas" class="img-thumbnail me-4" :width="mainStore.width * scale" :height="mainStore.height * scale" />
+        <table class="table table-bordered table-sm table-condensed mt-3">
+            <tbody>
+                <tr v-for="y in mainStore.height" :key="y">
+                    <td v-for="x in mainStore.width" :key="x" class="px-3 text-center">
+                        {{ table?.[x-1]?.[y-1] ? (table?.[x-1]?.[y-1] + 1) : '1' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div v-if="mainStore.width * mainStore.height !== compared" class="alert alert-warning d-print-none" role="alert">
         Количество ячеек ({{ mainStore.width * mainStore.height }}) не совпадает с количеством цветов ({{ compared }})
     </div>
-    <div class="my-4">
+    <div class="my-4 d-print-none">
         <button class="btn btn-primary" :disabled="mainStore.width * mainStore.height !== compared" @click="generateImage">Сгенерировать</button>
+        <button type="button" class="btn btn-outline-secondary ms-2" @click="print">Распечатать</button>
     </div>
 </template>
 
@@ -29,7 +66,7 @@ const mainStore = useMainStore()
 
 const canvas = ref()
 const table = ref({})
-const scale = ref(20)
+const scale = ref(30)
 
 function generateImage() {
     if (!mainStore.fixedCombinationSeed) {
@@ -97,6 +134,10 @@ const compared = computed(() => {
     }
     return total
 })
+
+function print() {
+    window.print()
+}
 
 function shuffleArrayWithSeed(array, seed) {
     const getRandom = (min, max) => {
