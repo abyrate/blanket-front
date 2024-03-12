@@ -13,10 +13,10 @@
                 <label for="colors" class="form-label">Количество цветов:</label>
                 <input id="colors" v-model="numColors" class="form-control" type="number">
             </div>
-            <!-- <div class="mb-3">
-                <label for="seed" class="form-label">Сид:</label>
+            <div class="mb-3">
+                <label for="seed" class="form-label">Сид палитры:</label>
                 <input id="seed" v-model="seed" class="form-control" type="number">
-            </div> -->
+            </div>
             <div v-if="width * height !== compared" class="alert alert-warning" role="alert">
                 Количество ячеек ({{ width * height }}) не совпадает с количеством цветов ({{ compared }})
             </div>
@@ -33,7 +33,7 @@
                 <tbody>
                     <tr v-for="y in height" :key="y">
                         <td v-for="x in width" :key="x">
-                            {{ table?.[x-1]?.[y-1] + 1 }}
+                            {{ table?.[x-1]?.[y-1] ? (table?.[x-1]?.[y-1] + 1) : '1' }}
                         </td>
                     </tr>
                 </tbody>
@@ -48,6 +48,7 @@
 
 <script setup>
 import seedrandom from 'seedrandom'
+import convert from 'color-convert'
 import { computed, ref } from 'vue'
 
 const width = ref(1)
@@ -56,7 +57,7 @@ const numColors = ref(1)
 const pixelsPerColor = ref({}) // Объект для хранения количества пикселей для каждого цвета
 
 const colors = ref([])
-// const seed = ref(Math.floor(Math.random() * numColors.value))
+const seed = ref(Math.floor(Math.random() * 10000))
 const scale = ref(20)
 const canvas = ref()
 const table = ref({})
@@ -64,14 +65,13 @@ const table = ref({})
 function createPalette() {
     // Сбрасываем массив цветов
     colors.value = []
-    let color
 
-    while (colors.value.length < numColors.value) {
-        color = generateColor()
+    const baseColor = generateColor()
 
-        if (colors.value.indexOf(color) === -1) {
-            colors.value.push(color)
-        }
+    for (let i = 0; i < numColors.value; i++) {
+        const hueShift = ((360 / numColors.value) * i) % 360
+        const color = convert.hsl.rgb((baseColor[0] + hueShift) % 255, baseColor[1], baseColor[2])
+        colors.value.push(color)
     }
 }
 
@@ -85,7 +85,7 @@ function generateImage() {
 
     for (let x = 0; x < width.value; x++) {
         for (let y = 0; y < height.value; y++) {
-            coords.push(x + '-' + y)
+            coords.push([x, y])
         }
     }
 
@@ -96,14 +96,10 @@ function generateImage() {
             if (coords.length) {
                 const coordsIndex = Math.floor(Math.random() * coords.length)
 
-                console.log(coords[coordsIndex], coordsIndex, coords.length)
-                const coord = coords[coordsIndex].split('-')
-                const x = coord[0]
-                const y = coord[1]
+                const x = coords[coordsIndex][0]
+                const y = coords[coordsIndex][1]
 
                 coords.splice(coordsIndex, 1)
-
-                // console.log(x, y, color)
 
                 context.fillStyle = `rgb(${color})`
                 context.fillRect(x * scale.value, y * scale.value, scale.value, scale.value)
@@ -116,44 +112,16 @@ function generateImage() {
             }
         }
     }
-    // for (let x = 0; x < width.value; x++) {
-    //     for (let y = 0; y < height.value; y++) {
-    //         let color
-
-    //         do {
-    //             const colorIndex = getRandom(1, numColors.value)
-
-    //             if (colors.value?.[colorIndex] && pixelsPerColorCounter[colorIndex] > 0) {
-    //                 color = colors.value[colorIndex]
-    //                 pixelsPerColorCounter[colorIndex]--
-    //             }
-    //         } while (!color)
-
-    //         context.fillStyle = `rgb(${color})`
-    //         context.fillRect(x * scale.value, y * scale.value, scale.value, scale.value)
-
-    //         if (!table.value?.[x]) {
-    //             table.value[x] = {}
-    //         }
-
-    //         table.value[x][y] = colors.value.indexOf(color)
-    //     }
-    // }
-    // console.log(table.value, colors.value)
 }
 function generateColor() {
-    const rng = seedrandom(Math.floor(Math.random() * numColors.value))
+    const rng = seedrandom(seed.value)
 
     return [
-        Math.round(rng() * 255),
-        Math.round(rng() * 255),
-        Math.round(rng() * 255),
-    ].join(',')
+        Math.round(rng() * 360),
+        70,
+        80,
+    ]
 }
-
-// function getRandom(min, max) {
-//     return Math.floor(Math.random() * (max - min) + min)
-// }
 
 const compared = computed(() => {
     let total = 0
@@ -163,6 +131,7 @@ const compared = computed(() => {
     }
     return total
 })
+
 </script>
 
 <style>
