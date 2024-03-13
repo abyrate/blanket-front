@@ -1,7 +1,7 @@
 <template>
     <div v-for="colorIndex in mainStore.numColors" :key="colorIndex" class="mb-3">
         <label :for="'pixelsPerColor-' + colorIndex" class="form-label">Количество пикселей {{ colorIndex }} цвета:</label>
-        <input :id="'pixelsPerColor-' + colorIndex" v-model="mainStore.pixelsPerColor[colorIndex]" class="form-control" type="number">
+        <input :id="'pixelsPerColor-' + colorIndex" v-model="mainStore.pixelsPerColor[colorIndex]" min="0" class="form-control" type="number">
     </div>
 </template>
 
