@@ -10,6 +10,7 @@ export const useMainStore = defineStore('main', () => {
     const combinationSeed = ref(Math.floor(Math.random() * 10000))
     const pixelsPerColor = ref({}) // Объект для хранения количества пикселей для каждого цвета
     const colors = ref([])
+    const ymCounter = 96722734
 
     return {
         width,
@@ -20,5 +21,6 @@ export const useMainStore = defineStore('main', () => {
         combinationSeed,
         pixelsPerColor,
         colors,
+        ymCounter,
     }
 })
