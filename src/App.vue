@@ -16,12 +16,9 @@
 import BaseSetting from '@/components/BaseSetting.vue'
 import ColorsInput from '@/components/ColorsInput.vue'
 import ResultPalette from '@/components/ResultPalette.vue'
-import useMainStore from '@/store'
 
 if (process.env.NODE_ENV === 'production') {
-    const mainStore = useMainStore()
-
-    document?.ym(mainStore.ymCounter, 'init', {
+    document?.ym(process.env.VUE_APP_YM_COUNTER, 'init', {
         defer: true,
         clickmap: true,
         trackLinks: true,
