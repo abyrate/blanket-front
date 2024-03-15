@@ -1,5 +1,5 @@
 <template>
-    <div class="row mt-4">
+    <div class="row mt-4 mb-5">
         <div class="col-sm-4 d-print-none">
             <BaseSetting />
         </div>
@@ -10,8 +10,10 @@
             <ResultPalette />
         </div>
     </div>
-    <div class="position-absolute bottom-0 end-0 m-4">
-        <a target="_blank" class="btn btn-outline-primary d-print-none" href="https://pay.cloudtips.ru/p/99b3202e" @click="donateAction">Поддержать автора</a>
+    <div class="fixed-bottom text-end">
+        <div class="pb-3 pe-4">
+            <a target="_blank" class="btn btn-outline-primary d-print-none" href="https://pay.cloudtips.ru/p/99b3202e" @click="donateAction">Поддержать автора</a>
+        </div>
     </div>
 </template>
 
