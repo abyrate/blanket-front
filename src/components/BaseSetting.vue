@@ -12,11 +12,11 @@
         <input id="colors" v-model="mainStore.numColors" min="0" class="form-control" type="number">
     </div>
     <div class="mb-3">
-        <label for="seedPalette" class="form-label">Сид палитры:</label>
+        <label for="seedPalette" class="form-label">Вариант палитры:</label>
         <input id="seedPalette" v-model="mainStore.seedPalette" min="0" class="form-control" type="number">
     </div>
     <div class="mb-3">
-        <label for="seedCombination" class="form-label">Сид комбинации:</label>
+        <label for="seedCombination" class="form-label">Вариант комбинации:</label>
         <div class="input-group mb-3">
             <div class="input-group-text">
                 <input v-model="mainStore.fixedCombinationSeed" class="form-check-input mt-0" type="checkbox">

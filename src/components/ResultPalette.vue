@@ -7,10 +7,10 @@
             <strong>Высота</strong>: {{ mainStore.height }}
         </div>
         <div>
-            <strong>Сид палитры</strong>: {{ mainStore.seedPalette }}
+            <strong>Вариант палитры</strong>: {{ mainStore.seedPalette }}
         </div>
         <div>
-            <strong>Сид комбинации</strong>: {{ mainStore.combinationSeed }}
+            <strong>Вариант комбинации</strong>: {{ mainStore.combinationSeed }}
         </div>
         <div>
             <strong>Количество цветов</strong>: {{ mainStore.numColors }}
