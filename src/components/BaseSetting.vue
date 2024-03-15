@@ -1,15 +1,15 @@
 <template>
     <div class="mb-3">
         <label for="width" class="form-label">Лоскутов в ширину:</label>
-        <input id="width" v-model="mainStore.width" min="0" class="form-control" type="number">
+        <input id="width" v-model="mainStore.width" min="1" class="form-control" type="number">
     </div>
     <div class="mb-3">
         <label for="height" class="form-label">Лоскутов в высоту:</label>
-        <input id="height" v-model="mainStore.height" min="0" class="form-control" type="number">
+        <input id="height" v-model="mainStore.height" min="1" class="form-control" type="number">
     </div>
     <div class="mb-3">
         <label for="colors" class="form-label">Количество цветов:</label>
-        <input id="colors" v-model="mainStore.numColors" min="0" class="form-control" type="number">
+        <input id="colors" v-model="mainStore.numColors" min="1" class="form-control" type="number">
     </div>
     <div class="mb-3">
         <div class="form-check">
