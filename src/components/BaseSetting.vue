@@ -1,10 +1,10 @@
 <template>
     <div class="mb-3">
-        <label for="width" class="form-label">Ширина:</label>
+        <label for="width" class="form-label">Лоскутов в ширину:</label>
         <input id="width" v-model="mainStore.width" min="0" class="form-control" type="number">
     </div>
     <div class="mb-3">
-        <label for="height" class="form-label">Высота:</label>
+        <label for="height" class="form-label">Лоскутов в высоту:</label>
         <input id="height" v-model="mainStore.height" min="0" class="form-control" type="number">
     </div>
     <div class="mb-3">
@@ -15,7 +15,7 @@
         <div class="form-check">
             <input id="flexCheckDefault" v-model="showSeeds" class="form-check-input" type="checkbox">
             <label class="form-check-label" for="flexCheckDefault">
-                Настроить варианты
+                Настроить вариативность
             </label>
         </div>
     </div>
