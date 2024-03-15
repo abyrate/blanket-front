@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="position-absolute bottom-0 end-0 m-4">
-        <a target="_blank" class="btn btn-outline-primary d-print-none" href="https://pay.cloudtips.ru/p/99b3202e">Поддержать автора</a>
+        <a target="_blank" class="btn btn-outline-primary d-print-none" href="https://pay.cloudtips.ru/p/99b3202e" @click="donateAction">Поддержать автора</a>
     </div>
 </template>
 
@@ -28,6 +28,12 @@ if (process.env.NODE_ENV === 'production') {
         accurateTrackBounce: true,
         webvisor: true,
     })
+}
+
+function donateAction() {
+    if (process.env.NODE_ENV === 'production') {
+        document?.ym(process.env.VUE_APP_YM_COUNTER, 'reachGoal', 'donate')
+    }
 }
 </script>
 

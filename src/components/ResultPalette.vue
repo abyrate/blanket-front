@@ -69,6 +69,10 @@ const table = ref({})
 const scale = ref(30)
 
 function generateImage() {
+    if (process.env.NODE_ENV === 'production') {
+        document?.ym(process.env.VUE_APP_YM_COUNTER, 'reachGoal', 'generate')
+    }
+
     if (!mainStore.fixedCombinationSeed) {
         mainStore.combinationSeed = Math.floor(Math.random() * 10000)
     }
@@ -136,6 +140,10 @@ const compared = computed(() => {
 })
 
 function print() {
+    if (process.env.NODE_ENV === 'production') {
+        document?.ym(process.env.VUE_APP_YM_COUNTER, 'reachGoal', 'print')
+    }
+
     window.print()
 }
 
