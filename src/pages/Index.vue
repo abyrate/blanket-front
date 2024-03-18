@@ -1,5 +1,5 @@
 <template>
-    <div class="row mt-4">
+    <div class="row">
         <div class="col-sm-4 d-print-none">
             <BaseSetting />
         </div>

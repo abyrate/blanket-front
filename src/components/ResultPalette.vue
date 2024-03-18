@@ -49,9 +49,9 @@
     <div v-if="mainStore.width * mainStore.height !== compared" class="alert alert-warning d-print-none" role="alert">
         Количество ячеек ({{ mainStore.width * mainStore.height }}) не совпадает с количеством цветов ({{ compared }})
     </div>
-    <div class="my-4 d-print-none">
-        <button class="btn btn-primary" :disabled="mainStore.width * mainStore.height !== compared" @click="generateImage">Сгенерировать</button>
-        <button type="button" class="btn btn-outline-secondary ms-2" @click="print">Распечатать</button>
+    <div class="d-print-none">
+        <button class="btn btn-primary my-2 me-2" :disabled="mainStore.width * mainStore.height !== compared" @click="generateImage">Сгенерировать</button>
+        <button type="button" class="btn btn-outline-secondary my-2" @click="print">Распечатать</button>
     </div>
 </template>
 
