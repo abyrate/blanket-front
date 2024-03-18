@@ -25,11 +25,12 @@
     </div>
     <div v-if="showSeeds" class="mb-3">
         <label for="seedCombination" class="form-label">Вариант комбинации:</label>
-        <div class="input-group mb-3">
-            <div class="input-group-text">
-                <input v-model="mainStore.fixedCombinationSeed" class="form-check-input mt-0" type="checkbox">
-            </div>
+        <div class="input-group">
+            <button id="button-addon1" class="btn btn-outline-secondary" type="button" @click="toggleFixedCombinationSeed">{{ mainStore.fixedCombinationSeed ? 'Случайно' : 'Зафиксировать' }}</button>
             <input v-model="mainStore.combinationSeed" min="0" type="text" class="form-control" :disabled="mainStore.fixedCombinationSeed">
+        </div>
+        <div id="emailHelp" class="form-text">
+            {{ mainStore.fixedCombinationSeed ? 'Вариант зафиксирован' : 'Случайный вариант' }}
         </div>
     </div>
 </template>
@@ -41,6 +42,10 @@ import { ref } from 'vue'
 const mainStore = useMainStore()
 
 const showSeeds = ref(false)
+
+function toggleFixedCombinationSeed() {
+    mainStore.fixedCombinationSeed = !mainStore.fixedCombinationSeed
+}
 </script>
 
 <style lang="scss" scoped>
