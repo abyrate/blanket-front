@@ -35,5 +35,5 @@ jobs:
           script: |
             cd ${{ secrets.PATH_TO_DEPLOY }}
             rm -rf *
-          source: "./dist"                    # Папка со сборкой фронтенда
-          target: ${{ secrets.PATH_TO_DEPLOY }}  # Целевая директория на сервере
+            rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:$TARGET_DIR
+            rm -f private_key
