@@ -32,5 +32,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           rm_target: true
-          source: "./dist/"
+          source: "dist/*"
           target:  ${{ secrets.PATH_TO_DEPLOY }}
+          recursive: true
+          strip_components: 1
+          overwrite: true
