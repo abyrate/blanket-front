@@ -22,20 +22,13 @@ jobs:
 
       - name: Install dependencies and build
         run: |
-          yarn install
+          yarn
           yarn build
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          # Если нужно выполнить команды на сервере:
-          script: |
-            cd ${{ secrets.PATH_TO_DEPLOY }}
-            rm -rf *
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-            chmod 600 private_key
-            rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./build/ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:$TARGET_DIR
-            rm -f private_key
+      - name: Deploy via SCP
+        env:
+          TARGET_DIR: ${{ secrets.PATH_TO_DEPLOY }} # Укажите путь к папке на сервере
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:$TARGET_DIR
+          rm -f private_key
