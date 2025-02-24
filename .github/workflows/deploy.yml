@@ -33,5 +33,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           password: ${{ secrets.SSH_PASSWORD }}
           rm: true
-          source: "./dist"
+          source: "./dist/"
           target:  ${{ secrets.PATH_TO_DEPLOY }}
