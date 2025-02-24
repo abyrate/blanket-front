@@ -1,0 +1,39 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies and build
+        run: |
+          yarn install
+          yarn build
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+          # Если нужно выполнить команды на сервере:
+          script: |
+            cd ${{ secrets.PATH_TO_DEPLOY }}
+            rm -rf *
+          source: "./dist"                    # Папка со сборкой фронтенда
+          target: ${{ secrets.PATH_TO_DEPLOY }}  # Целевая директория на сервере
