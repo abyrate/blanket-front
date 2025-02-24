@@ -1,13 +1,34 @@
-import 'bootstrap/dist/css/bootstrap.css'
-
 import { createApp } from 'vue'
-import App from './App.vue'
 import { createPinia } from 'pinia'
-import router from '@/bootstrap/router'
+import { createRouter, createWebHistory } from 'vue-router'
+import App from './App.vue'
 
+// Подключаем стили Bulma и Remixicon
+import 'bulma/css/bulma.min.css'
+import 'remixicon/fonts/remixicon.css'
+
+// Создаем экземпляр Pinia
 const pinia = createPinia()
 
-createApp(App)
-    .use(pinia)
-    .use(router)
-    .mount('#app')
+// Создаем роутер (здесь нужно будет добавить ваши маршруты)
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {
+            path: '/',
+            component: () => import('./views/Home.vue')
+        },
+        {
+            path: '/help',
+            component: () => import('./views/Help.vue')
+        }
+    ]
+})
+
+const app = createApp(App)
+
+// Подключаем плагины
+app.use(pinia)
+app.use(router)
+
+app.mount('#app')
