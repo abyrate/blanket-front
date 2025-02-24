@@ -30,8 +30,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+          password: ${{ secrets.SSH_PASSWORD }}
           # Если нужно выполнить команды на сервере:
           script: |
             cd ${{ secrets.PATH_TO_DEPLOY }}
