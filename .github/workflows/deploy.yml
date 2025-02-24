@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: prod
 
     steps:
       - name: Checkout repository
@@ -25,7 +26,7 @@ jobs:
           yarn build
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -35,5 +36,5 @@ jobs:
           script: |
             cd ${{ secrets.PATH_TO_DEPLOY }}
             rm -rf *
-            rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./dist/ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:$TARGET_DIR
-            rm -f private_key
+          source: "./dist"                    # Папка со сборкой фронтенда
+          target: ${{ secrets.PATH_TO_DEPLOY }}  # Целевая директория на сервере
