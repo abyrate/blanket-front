@@ -24,14 +24,17 @@
             let name = 'Красный'
 
             try {
-                const response = await fetch(`https://www.thecolorapi.com/id?hex=${color.slice(1)}`)
+                const response = await fetch('https://api.лоскутное-одеяло.рф/color/name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        hex: color.slice(1)
+                    })
+                })
                 const data = await response.json()
-
-                const colorsResponse = await fetch(`/colors.json`)
-                const jsonData = await colorsResponse.json()
-
-                name = jsonData.find(item => item.Hex === data.name.closest_named_hex)?.Name || data.name.value
-
+                name = data.name
                 colorNames.value[color] = name
             } catch (error) {
                 console.error('Ошибка при получении названия цвета:', error)
