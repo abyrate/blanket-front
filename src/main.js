@@ -26,7 +26,7 @@ const router = createRouter({
 })
 
 router.afterEach(async (to, from, next) => {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && document?.ym) {
         document?.ym(document.ymCounter, 'hit', document.URL)
     }
 })
