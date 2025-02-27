@@ -1,12 +1,25 @@
 <script setup>
-    import { ref, watch } from 'vue'
+    import { ref, watch, computed } from 'vue'
     import { useMainStore } from '@/store'
     import Preview from './Preview.vue'
+    import PrintTemplate from './PrintTemplate.vue'
 
     const store = useMainStore()
 
     const colorNames = ref({})
     const loadingColors = ref({})
+    const printTemplateRef = ref(null)
+    const isGenerating = ref(false)
+
+    // Проверяем, загружены ли все цвета
+    const isAllColorsLoaded = computed(() => {
+        return store.patches.every(patch => colorNames.value[patch.color])
+    })
+
+    // Проверяем, можно ли генерировать PDF
+    const canGeneratePdf = computed(() => {
+        return store.generated && isAllColorsLoaded.value && !isGenerating.value
+    })
 
     // Функция для очистки неиспользуемых цветов
     function cleanupColorNames() {
@@ -70,6 +83,66 @@
         },
         { immediate: true, deep: true }
     )
+
+    async function generatePDF() {
+        if (!printTemplateRef.value || !canGeneratePdf.value) return
+
+        try {
+            isGenerating.value = true
+            const html = printTemplateRef.value.getHTML()
+            const response = await fetch('https://api.лоскутное-одеяло.рф/pdf/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ html })
+            })
+
+            if (!response.ok) throw new Error('Ошибка при генерации PDF')
+
+            const pdfBlob = await response.blob()
+            return pdfBlob
+        } catch (error) {
+            console.error('Ошибка при генерации PDF:', error)
+            throw error
+        } finally {
+            isGenerating.value = false
+        }
+    }
+
+    async function handlePrint() {
+        try {
+            const pdfBlob = await generatePDF()
+            const pdfUrl = URL.createObjectURL(pdfBlob)
+
+            // Открываем PDF в новом окне для печати
+            const printWindow = window.open(pdfUrl)
+            printWindow.onload = () => {
+                printWindow.print()
+                URL.revokeObjectURL(pdfUrl)
+            }
+        } catch (error) {
+            alert('Ошибка при подготовке к печати')
+        }
+    }
+
+    async function handleDownload() {
+        try {
+            const pdfBlob = await generatePDF()
+            const downloadUrl = URL.createObjectURL(pdfBlob)
+
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = 'blanket.pdf'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+
+            setTimeout(() => URL.revokeObjectURL(downloadUrl), 100)
+        } catch (error) {
+            alert('Ошибка при скачивании PDF')
+        }
+    }
 </script>
 
 <template>
@@ -106,9 +179,9 @@
         </table>
     </div>
     <!-- Дополнительные кнопки (печать, экспорт) -->
-    <!-- <div class="field is-grouped">
+    <div class="field is-grouped">
         <div class="control">
-            <button type="button" class="button is-primary">
+            <button type="button" class="button is-primary" @click="handlePrint" :disabled="!canGeneratePdf" :class="{ 'is-loading': isGenerating }">
                 <span class="icon">
                     <i class="ri-printer-line"></i>
                 </span>
@@ -116,14 +189,17 @@
             </button>
         </div>
         <div class="control">
-            <button type="button" class="button is-info">
+            <button type="button" class="button is-info" @click="handleDownload" :disabled="!canGeneratePdf" :class="{ 'is-loading': isGenerating }">
                 <span class="icon">
                     <i class="ri-download-2-line"></i>
                 </span>
                 <span>Сохранить в PDF</span>
             </button>
         </div>
-    </div> -->
+    </div>
+
+    <!-- Скрытый компонент для генерации PDF -->
+    <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" />
 </template>
 
 <style scoped>
