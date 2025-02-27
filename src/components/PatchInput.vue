@@ -23,7 +23,7 @@
             <input class="input color-picker" type="color" v-model="patch.color">
         </div>
         <div class="control is-expanded">
-            <input class="input" type="number" v-model="patch.count" placeholder="Цвет 1: количество лоскутов">
+            <input class="input" type="number" v-model="patch.count" :placeholder="`Цвет ${index + 1}: количество лоскутов`">
         </div>
         <div class="control">
             <button type="button" class="button is-danger" @click="emit('removePatch', index)" :disabled="!hasDelete">

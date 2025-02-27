@@ -25,6 +25,10 @@
         combinationSeed: {
             type: Number,
             required: true
+        },
+        quiltPattern: {
+            type: Array,
+            required: true
         }
     })
 
@@ -45,9 +49,38 @@
         }
     }
 
+    // Генерируем HTML для числовой схемы
+    function generateNumericTable() {
+        if (!props.quiltPattern) return ''
+
+        const rows = props.quiltPattern.map((row, y) => `
+            <tr>
+                ${row.map((patchIndex, x) => `
+                    <td style="border: 1px solid #ddd; padding: 4px; text-align: center; width: 24px; height: 24px; font-weight: bold; font-size: 12px;">
+                        ${patchIndex + 1}
+                    </td>
+                `).join('')}
+            </tr>
+        `).join('')
+
+        return `
+        <div style="text-align: center; page-break-inside: avoid;">
+            <h2>Числовая схема</h2>
+            <div style="display: flex; justify-content: center;">
+                <div style="overflow-x: auto;">
+                    <table style="border-collapse: collapse; width: auto; margin: 0 auto;">
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>`
+    }
+
     // Метод для получения HTML разметки
     function getHTML() {
-        // Генерируем строки таблицы
+        // Генерируем строки таблицы легенды
         const tableRows = props.patches.map((patch, index) => `
             <tr>
                 <td style="border: 1px solid #ddd; padding: 8px; text-align: center; width: 40px;">${index + 1}</td>
@@ -83,30 +116,33 @@
         h2 {
             font-size: 18px;
             font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 10px;
         }
         .info-block {
-            margin: 20px 0;
-            padding: 15px;
+            margin: 5px 0 0;
+            padding: 10px;
             background-color: #f8f9fa;
             border-radius: 4px;
+            page-break-inside: avoid;
         }
         .preview-image {
             max-width: 100%;
             height: auto;
-            margin: 20px 0;
+            margin: 5px 0 0;
             page-break-inside: avoid;
         }
         .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
+            margin-top: 5px;
             font-size: 12px;
             color: #666;
+            page-break-inside: avoid;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             page-break-inside: avoid;
+            margin-bottom: 0;
         }
         th:nth-child(1), td:nth-child(1) {
             width: 40px;
@@ -117,27 +153,35 @@
         th:nth-child(3), td:nth-child(3) {
             width: 80px;
         }
+        .section-break {
+            page-break-before: always;
+        }
+        .section {
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 <body>
-    <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <div style="margin: 0 auto; padding: 0;">
         <h1 style="text-align: center; color: #333;">Схема лоскутного одеяла</h1>
 
         <!-- Информация о размерах и варианте -->
         <div class="info-block">
-            <h2>Параметры схемы</h2>
             <p><strong>Размеры:</strong> ${props.width}x${props.height} лоскутов</p>
             <p><strong>Вариант комбинации:</strong> ${props.combinationSeed}</p>
         </div>
 
-        <!-- Превью схемы -->
-        <div style="text-align: center;">
-            <h2>Схема</h2>
+        <!-- Графическая схема -->
+        <div class="section" style="text-align: center;">
+            <h2>Графическая схема</h2>
             ${previewImage.value ? `<img src="${previewImage.value}" alt="Схема одеяла" class="preview-image">` : '<p>Схема недоступна</p>'}
         </div>
 
+        <!-- Числовая схема -->
+        ${generateNumericTable()}
+
         <!-- Легенда цветов -->
-        <div style="margin-top: 30px;">
+        <div class="section" style="text-align: center;">
             <h2 style="color: #444;">Легенда цветов</h2>
             <table>
                 <thead>
@@ -156,7 +200,7 @@
         <!-- Подвал -->
         <div class="footer">
             <p>Дата создания: ${new Date().toLocaleDateString('ru-RU')}</p>
-            <p>Схема сгенерирована на сайте <a style="text-decoration: none;" href="https://лоскутное-одеяло.рф">лоскутное-одеяло.рф</a></p>
+            <p>Схема сгенерирована на сайте <a href="https://лоскутное-одеяло.рф" style="text-decoration: none;">лоскутное-одеяло.рф</a></p>
         </div>
     </div>
 </body>

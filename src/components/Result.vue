@@ -10,6 +10,7 @@
     const loadingColors = ref({})
     const printTemplateRef = ref(null)
     const isGenerating = ref(false)
+    const activeView = ref('graphic') // 'graphic' или 'numeric'
 
     // Проверяем, загружены ли все цвета
     const isAllColorsLoaded = computed(() => {
@@ -19,6 +20,16 @@
     // Проверяем, можно ли генерировать PDF
     const canGeneratePdf = computed(() => {
         return store.generated && isAllColorsLoaded.value && !isGenerating.value
+    })
+
+    // Определяем, находимся ли мы на мобильном устройстве
+    const isMobile = computed(() => {
+        return window.innerWidth < 768
+    })
+
+    // Следим за изменением размера окна
+    window.addEventListener('resize', () => {
+        isMobile.value = window.innerWidth < 768
     })
 
     // Функция для очистки неиспользуемых цветов
@@ -148,8 +159,58 @@
 <template>
     <div class="box">
         <h2 class="title is-5">Предпросмотр</h2>
-        <!-- Превью (placeholder) -->
-        <Preview />
+
+        <!-- Переключатель видов схемы -->
+        <div v-if="store.generated" class="mb-4">
+            <!-- Мобильная версия -->
+            <button v-if="isMobile" class="button is-fullwidth" @click="activeView = activeView === 'graphic' ? 'numeric' : 'graphic'">
+                <span class="icon">
+                    <i :class="activeView === 'graphic' ? 'ri-table-line' : 'ri-image-line'"></i>
+                </span>
+                <span>{{ activeView === 'graphic' ? 'Показать числовую схему' : 'Показать графическую схему' }}</span>
+            </button>
+
+            <!-- Десктопная версия -->
+            <div v-else class="tabs">
+                <ul>
+                    <li :class="{ 'is-active': activeView === 'graphic' }">
+                        <a @click="activeView = 'graphic'">
+                            <span class="icon"><i class="ri-image-line"></i></span>
+                            <span>Графическая схема</span>
+                        </a>
+                    </li>
+                    <li :class="{ 'is-active': activeView === 'numeric' }">
+                        <a @click="activeView = 'numeric'">
+                            <span class="icon"><i class="ri-table-line"></i></span>
+                            <span>Числовая схема</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Контейнер для схем с анимацией -->
+        <div class="preview-container">
+            <!-- Графическая схема -->
+            <div v-show="activeView === 'graphic'" :class="{ 'is-hidden-mobile': activeView === 'numeric' }">
+                <Preview />
+            </div>
+
+            <!-- Числовая схема -->
+            <div v-show="activeView === 'numeric'" :class="{ 'is-hidden-mobile': activeView === 'graphic' }">
+                <div class="numeric-preview" v-if="store.generated">
+                    <table class="table is-bordered numeric-table">
+                        <tbody>
+                            <tr v-for="(row, y) in store.quiltPattern" :key="y">
+                                <td v-for="(patchIndex, x) in row" :key="x" class="has-text-centered">
+                                    {{ patchIndex + 1 }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <!-- Легенда цветов -->
         <h3 class="title is-6 mt-5 mb-2">Легенда цветов</h3>
@@ -199,7 +260,7 @@
     </div>
 
     <!-- Скрытый компонент для генерации PDF -->
-    <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" />
+    <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" :quilt-pattern="store.quiltPattern" />
 </template>
 
 <style scoped>
@@ -214,5 +275,44 @@
         border-radius: 5px;
         display: inline-block;
         margin-right: 5px;
+    }
+
+    .preview-container {
+        position: relative;
+        min-height: 200px;
+    }
+
+    .numeric-preview {
+        overflow-x: auto;
+    }
+
+    .numeric-table td {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        line-height: 40px;
+        font-weight: bold;
+    }
+
+    @media screen and (max-width: 768px) {
+        .numeric-table td {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Анимация переключения видов на мобильных устройствах */
+    @media screen and (max-width: 768px) {
+        .preview-container>div {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .is-hidden-mobile {
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
     }
 </style>

@@ -40,7 +40,7 @@
             <!-- Распределение лоскутов по цветам с выбором цвета -->
             <div class="field mb-5">
                 <label class="label">Распределение лоскутов по цветам</label>
-                <PatchInput v-for="(patch, index) in store.patches" :key="index" :patch="patch" @removePatch="store.removePatch(index)" :hasDelete="store.patches.length > 1" />
+                <PatchInput v-for="(patch, index) in store.patches" :key="index" :index="index" :patch="patch" @removePatch="store.removePatch(index)" :hasDelete="store.patches.length > 1" />
                 <button type="button" class="button is-link is-fullwidth" @click="store.addPatch">Добавить цвет</button>
             </div>
 
