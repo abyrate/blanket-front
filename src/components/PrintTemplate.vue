@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, onMounted } from 'vue'
+    import { ref, onMounted, watch } from 'vue'
 
     const props = defineProps({
         patches: {
@@ -35,18 +35,31 @@
     const templateRef = ref(null)
     const previewImage = ref('')
 
+    // Следим за изменениями схемы
+    watch(() => props.quiltPattern, () => {
+        updatePreviewImage()
+    }, { deep: true })
+
+    // Также следим за изменениями цветов
+    watch(() => props.patches, () => {
+        updatePreviewImage()
+    }, { deep: true })
+
     onMounted(() => {
         updatePreviewImage()
     })
 
     function updatePreviewImage() {
-        const canvas = document.querySelector('canvas')
-        if (canvas) {
-            previewImage.value = canvas.toDataURL('image/png')
-        } else {
-            // Если canvas не найден, пробуем еще раз через 100мс
-            setTimeout(updatePreviewImage, 100)
-        }
+        // Даем небольшую задержку, чтобы canvas успел обновиться
+        setTimeout(() => {
+            const canvas = document.querySelector('canvas')
+            if (canvas) {
+                previewImage.value = canvas.toDataURL('image/png')
+            } else {
+                // Если canvas не найден, пробуем еще раз через 100мс
+                setTimeout(updatePreviewImage, 100)
+            }
+        }, 100)
     }
 
     // Генерируем HTML для числовой схемы

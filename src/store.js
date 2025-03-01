@@ -42,14 +42,14 @@ export const useMainStore = defineStore('main', () => {
         generated.value = false
     }
 
-    function generate() {
+    function generate(options = {}) {
         generated.value = false
 
         if (process.env.NODE_ENV === 'production' && document?.ym) {
             document?.ym(document?.ymCounter, 'reachGoal', 'generate')
         }
 
-        if (!fixedCombinationSeed.value) {
+        if (!options.skipSeedGeneration && !fixedCombinationSeed.value) {
             combinationSeed.value = Math.floor(Math.random() * 10000)
         }
 

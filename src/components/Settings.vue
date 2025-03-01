@@ -1,5 +1,5 @@
 <script setup>
-    import { computed } from 'vue'
+    import { computed, onMounted } from 'vue'
     import { useMainStore } from '@/store'
     const store = useMainStore()
     import PatchInput from '@/components/PatchInput.vue'
@@ -11,6 +11,145 @@
     const isError = computed(() => {
         return totalPatches.value !== store.width * store.height
     })
+
+    // Функция сохранения конфигурации в файл
+    function saveConfig() {
+        const config = {
+            width: store.width,
+            height: store.height,
+            patches: store.patches,
+            fixedCombinationSeed: store.fixedCombinationSeed,
+            combinationSeed: store.combinationSeed
+        }
+
+        const blob = new Blob([JSON.stringify(config)], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'quilt_config.quilt'
+        link.click()
+        URL.revokeObjectURL(url)
+    }
+
+    // Функция проверки валидности конфигурации
+    function validateConfig(width, height, patches) {
+        const totalPatches = patches.reduce((total, patch) => total + patch.count, 0)
+        return totalPatches === width * height
+    }
+
+    // Функция загрузки конфигурации из файла
+    function loadConfig(event) {
+        const file = event.target.files[0]
+        if (!file) return
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            try {
+                const config = JSON.parse(e.target.result)
+
+                // Проверяем валидность конфигурации
+                if (!validateConfig(config.width, config.height, config.patches)) {
+                    alert('Ошибка: количество лоскутов не соответствует размерам одеяла')
+                    return
+                }
+
+                // Запоминаем оригинальное значение фиксации
+                const originalFixed = config.fixedCombinationSeed
+
+                // Временно включаем фиксацию seed
+                store.fixedCombinationSeed = true
+
+                // Устанавливаем seed до других параметров
+                store.combinationSeed = config.combinationSeed
+
+                // Устанавливаем остальные параметры
+                store.width = config.width
+                store.height = config.height
+                store.patches = config.patches
+
+                // Генерируем схему
+                store.generate()
+
+                // Восстанавливаем оригинальное значение фиксации
+                store.fixedCombinationSeed = originalFixed
+            } catch (error) {
+                alert('Ошибка при чтении файла конфигурации')
+            }
+        }
+        reader.readAsText(file)
+    }
+
+    // Функция применения конфигурации из URL
+    function applyConfigFromUrl() {
+        const params = new URLSearchParams(window.location.search)
+        if (!params.has('w')) return
+
+        try {
+            // Получаем параметры
+            const width = parseInt(params.get('w'))
+            const height = parseInt(params.get('h'))
+            const colors = params.get('colors')?.split(',') || []
+            const counts = params.get('counts')?.split(',').map(Number) || []
+
+            // Создаем patches из цветов и количеств
+            const patches = colors.map((color, index) => ({
+                color,
+                count: counts[index] || 1
+            }))
+
+            // Проверяем валидность конфигурации
+            if (!validateConfig(width, height, patches)) {
+                console.error('Ошибка: количество лоскутов не соответствует размерам одеяла')
+                return
+            }
+
+            // Временно включаем фиксацию seed
+            store.fixedCombinationSeed = true
+
+            // Устанавливаем параметры
+            store.width = width
+            store.height = height
+            store.combinationSeed = parseInt(params.get('seed'))
+            store.patches = patches
+
+            // Генерируем схему
+            store.generate()
+
+            // Восстанавливаем значение фиксации
+            store.fixedCombinationSeed = params.get('fixed') === '1'
+
+            // Очищаем URL после применения
+            window.history.replaceState({}, '', window.location.pathname)
+        } catch (error) {
+            console.error('Ошибка при применении конфигурации из URL:', error)
+        }
+    }
+
+    // Проверяем URL при загрузке компонента
+    onMounted(() => {
+        applyConfigFromUrl()
+    })
+
+    // Функция генерации ссылки
+    async function getShareLink() {
+        const params = new URLSearchParams({
+            w: store.width,
+            h: store.height,
+            colors: store.patches.map(p => p.color).join(','),
+            counts: store.patches.map(p => p.count).join(','),
+            seed: store.combinationSeed,
+            fixed: store.fixedCombinationSeed ? '1' : '0'
+        })
+        const url = `${window.location.origin}/?${params.toString()}`
+
+        try {
+            await navigator?.clipboard?.writeText(url)
+            alert('Ссылка скопирована в буфер обмена')
+        } catch (error) {
+            // Если API буфера обмена недоступно, показываем ссылку
+            alert('Ссылка на конфигурацию:\n' + url)
+        }
+    }
 </script>
 
 <template>
@@ -86,8 +225,44 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Блок сохранения и загрузки -->
+            <div class="mt-5 pt-5 is-bordered-top">
+                <p class="subtitle is-6 mb-3">Сохранение и загрузка</p>
+                <div class="field is-grouped is-grouped-multiline">
+                    <div class="control">
+                        <button type="button" class="button" @click="saveConfig" :disabled="!store.generated">
+                            <span class="icon">
+                                <i class="ri-save-line"></i>
+                            </span>
+                            <span>Сохранить</span>
+                        </button>
+                    </div>
+                    <div class="control">
+                        <label class="button">
+                            <span class="icon">
+                                <i class="ri-folder-open-line"></i>
+                            </span>
+                            <span>Загрузить</span>
+                            <input type="file" accept=".quilt" style="display: none;" @change="loadConfig">
+                        </label>
+                    </div>
+                    <div class="control">
+                        <button type="button" class="button" @click="getShareLink" :disabled="!store.generated">
+                            <span class="icon">
+                                <i class="ri-share-line"></i>
+                            </span>
+                            <span>Ссылка</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+    .is-bordered-top {
+        border-top: 1px solid #dbdbdb;
+    }
+</style>
