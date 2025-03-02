@@ -217,7 +217,7 @@
                     </button>
                 </div>
                 <div class="control">
-                    <button type="button" class="button is-light" @click="store.reset">
+                    <button type="button" class="button is-light" @click="store.reset" aria-label="Сбросить настройки">
                         <span class="icon">
                             <i class="ri-delete-back-2-line"></i>
                         </span>
