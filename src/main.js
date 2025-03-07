@@ -21,6 +21,10 @@ const router = createRouter({
         {
             path: '/help',
             component: () => import('./views/Help.vue')
+        },
+        {
+            path: '/about',
+            redirect: '/help'
         }
     ]
 })
