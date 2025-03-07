@@ -33,6 +33,7 @@ router.afterEach(async (to, from, next) => {
 
 const app = createApp(App)
 
+
 // Подключаем плагины
 app.use(pinia)
 app.use(router)

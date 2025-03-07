@@ -1,12 +1,17 @@
 <script setup>
     import Navbar from './components/Navbar.vue'
-    import { ref } from 'vue'
+    import { onBeforeMount, ref } from 'vue'
+    import yMetrika from './bootstrap/y.metrika'
 
     const navbarRef = ref(null)
 
     function handleClick() {
         navbarRef.value?.closeMenu()
     }
+
+    onBeforeMount(() => {
+        yMetrika()
+    })
 </script>
 
 <template>
