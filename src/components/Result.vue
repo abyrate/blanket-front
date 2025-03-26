@@ -1,8 +1,9 @@
 <script setup>
     import { ref, watch, computed } from 'vue'
     import { useMainStore } from '@/store'
-    import Preview from './Preview.vue'
-    import PrintTemplate from './PrintTemplate.vue'
+    import Preview from '@/components/Preview.vue'
+    import PrintTemplate from '@/components/PrintTemplate.vue'
+    import DonateButton from '@/components/DonateButton.vue'
 
     const store = useMainStore()
 
@@ -258,6 +259,8 @@
             </button>
         </div>
     </div>
+
+    <DonateButton class="is-hidden-desktop is-hidden-tablet is-fullwidth" />
 
     <!-- Скрытый компонент для генерации PDF -->
     <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" :quilt-pattern="store.quiltPattern" />
