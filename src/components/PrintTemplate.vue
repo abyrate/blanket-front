@@ -29,6 +29,10 @@
         quiltPattern: {
             type: Array,
             required: true
+        },
+        usedPatches: {
+            type: Array,
+            required: true
         }
     })
 
@@ -104,6 +108,7 @@
                     </div>
                 </td>
                 <td style="border: 1px solid #ddd; padding: 8px; text-align: center; width: 80px;">${patch.count}</td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: center; width: 80px;">${props.usedPatches[index] || 0}</td>
             </tr>
         `).join('')
 
@@ -163,7 +168,8 @@
         th:nth-child(2), td:nth-child(2) {
             width: auto;
         }
-        th:nth-child(3), td:nth-child(3) {
+        th:nth-child(3), td:nth-child(3),
+        th:nth-child(4), td:nth-child(4) {
             width: 80px;
         }
         .section-break {
@@ -201,7 +207,8 @@
                     <tr style="background-color: #f5f5f5;">
                         <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">№</th>
                         <th style="border: 1px solid #ddd; padding: 8px;">Цвет</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Кол-во</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Исходное кол-во</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Использовано</th>
                     </tr>
                 </thead>
                 <tbody>

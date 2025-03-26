@@ -220,7 +220,8 @@
                 <tr>
                     <th>№</th>
                     <th>Цвет</th>
-                    <th>Кол-во лоскутов</th>
+                    <th>Исходное кол-во</th>
+                    <th>Использовано</th>
                 </tr>
             </thead>
             <tbody>
@@ -236,6 +237,7 @@
                         </div>
                     </td>
                     <td>{{ patch.count }}</td>
+                    <td>{{ store.usedPatches[index] || 0 }}</td>
                 </tr>
             </tbody>
         </table>
@@ -263,7 +265,7 @@
     <DonateButton class="is-hidden-desktop is-hidden-tablet is-fullwidth" />
 
     <!-- Скрытый компонент для генерации PDF -->
-    <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" :quilt-pattern="store.quiltPattern" />
+    <PrintTemplate ref="printTemplateRef" :patches="store.patches" :color-names="colorNames" :width="store.width" :height="store.height" :variant="store.variant" :combination-seed="store.combinationSeed" :quilt-pattern="store.quiltPattern" :used-patches="store.usedPatches" />
 </template>
 
 <style scoped>

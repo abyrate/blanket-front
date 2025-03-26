@@ -12,6 +12,7 @@ export const useMainStore = defineStore('main', () => {
     const patches = ref([])
     const generated = ref(false)
     const quiltPattern = ref([])
+    const usedPatches = ref([])
 
     function addPatch() {
         patches.value.push({
@@ -53,6 +54,9 @@ export const useMainStore = defineStore('main', () => {
             combinationSeed.value = Math.floor(Math.random() * 10000)
         }
 
+        const totalArea = width.value * height.value
+        const totalPatches = patches.value.reduce((sum, patch) => sum + patch.count, 0)
+
         const coords = []
         for (let x = 0; x < width.value; x++) {
             for (let y = 0; y < height.value; y++) {
@@ -65,15 +69,45 @@ export const useMainStore = defineStore('main', () => {
         quiltPattern.value = Array(height.value).fill(null)
             .map(() => Array(width.value).fill(null))
 
+        usedPatches.value = Array(patches.value.length).fill(0)
+
         let coordIndex = 0
-        for (let patchIndex = 0; patchIndex < patches.value.length; patchIndex++) {
-            const patch = patches.value[patchIndex]
-            for (let count = 0; count < patch.count; count++) {
-                if (coordIndex < shuffledCoords.length) {
-                    const [x, y] = shuffledCoords[coordIndex]
-                    quiltPattern.value[y][x] = patchIndex
-                    coordIndex++
+        for (let patchIndex = 0; patchIndex < patches.value.length && coordIndex < totalArea; patchIndex++) {
+            const [x, y] = shuffledCoords[coordIndex]
+            quiltPattern.value[y][x] = patchIndex
+            usedPatches.value[patchIndex]++
+            coordIndex++
+        }
+
+        if (coordIndex < totalArea) {
+            const remainingArea = totalArea - coordIndex
+            const remainingCoords = shuffledCoords.slice(coordIndex)
+
+            const remainingPatches = patches.value.map((patch, index) => ({
+                index,
+                count: Math.max(0, patch.count - 1)
+            }))
+
+            const totalRemaining = remainingPatches.reduce((sum, p) => sum + p.count, 0)
+            const scale = totalRemaining > 0 ? remainingArea / totalRemaining : 1
+
+            let usedArea = 0
+            for (const patch of remainingPatches) {
+                const scaledCount = Math.round(patch.count * scale)
+                for (let i = 0; i < scaledCount && usedArea < remainingArea; i++) {
+                    const [x, y] = remainingCoords[usedArea]
+                    quiltPattern.value[y][x] = patch.index
+                    usedPatches.value[patch.index]++
+                    usedArea++
                 }
+            }
+
+            while (usedArea < remainingArea) {
+                const [x, y] = remainingCoords[usedArea]
+                const patchIndex = Math.floor(seedrandom(combinationSeed.value + usedArea)() * patches.value.length)
+                quiltPattern.value[y][x] = patchIndex
+                usedPatches.value[patchIndex]++
+                usedArea++
             }
         }
 
@@ -109,6 +143,7 @@ export const useMainStore = defineStore('main', () => {
         combinationSeed,
         patches,
         quiltPattern,
+        usedPatches,
         addPatch,
         removePatch,
         reset,

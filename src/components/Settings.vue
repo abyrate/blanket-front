@@ -9,7 +9,7 @@
     })
 
     const isError = computed(() => {
-        return totalPatches.value !== store.width * store.height
+        return totalPatches.value < store.width * store.height
     })
 
     // Функция сохранения конфигурации в файл
@@ -34,7 +34,7 @@
     // Функция проверки валидности конфигурации
     function validateConfig(width, height, patches) {
         const totalPatches = patches.reduce((total, patch) => total + patch.count, 0)
-        return totalPatches === width * height
+        return totalPatches >= width * height
     }
 
     // Функция загрузки конфигурации из файла
@@ -202,7 +202,7 @@
             <!-- Предупреждение об ошибках (пример) -->
             <article class="message is-warning" v-if="isError">
                 <div class="message-body">
-                    Общее количество лоскутов всех цветов ({{ totalPatches }}) не совпадает с шириной × высотой ({{ store.width * store.height }}).
+                    Общее количество лоскутов всех цветов ({{ totalPatches }}) меньше чем ширина × высота ({{ store.width * store.height }}). Добавьте больше лоскутов.
                 </div>
             </article>
 

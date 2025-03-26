@@ -1,13 +1,7 @@
 <script setup>
     import Navbar from './components/Navbar.vue'
-    import { onBeforeMount, ref } from 'vue'
+    import { onBeforeMount } from 'vue'
     import yMetrika from './bootstrap/y.metrika'
-
-    const navbarRef = ref(null)
-
-    function handleClick() {
-        navbarRef.value?.closeMenu()
-    }
 
     onBeforeMount(() => {
         yMetrika()
@@ -17,7 +11,7 @@
 <template>
     <Navbar ref="navbarRef" />
 
-    <div class="container px-3 py-4" @click="handleClick">
+    <div class="container px-3 py-4">
         <router-view />
     </div>
 </template>
