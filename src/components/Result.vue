@@ -215,32 +215,34 @@
 
         <!-- Легенда цветов -->
         <h3 class="title is-6 mt-5 mb-2">Легенда цветов</h3>
-        <table class="table is-fullwidth is-bordered">
-            <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Цвет</th>
-                    <th>Исходное кол-во</th>
-                    <th>Использовано</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(patch, index) in store.patches" :key="index">
-                    <td>{{ index + 1 }}</td>
-                    <td>
-                        <div class="vertical-center">
-                            <span class="color-swatch" :title="patch.color" :style="{ backgroundColor: patch.color }"></span>
-                            <span v-if="colorNames[patch.color]">{{ colorNames[patch.color] }}</span>
-                            <span v-else>
-                                <span @vue:mounted="debouncedColorUpdate(patch.color)">Загрузка...</span>
-                            </span>
-                        </div>
-                    </td>
-                    <td>{{ patch.count }}</td>
-                    <td>{{ store.usedPatches[index] || 0 }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-container pb-2">
+            <table class="table is-fullwidth is-bordered">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Цвет</th>
+                        <th>Исходное кол-во</th>
+                        <th>Использовано</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(patch, index) in store.patches" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>
+                            <div class="vertical-center">
+                                <span class="color-swatch" :title="patch.color" :style="{ backgroundColor: patch.color }"></span>
+                                <span v-if="colorNames[patch.color]">{{ colorNames[patch.color] }}</span>
+                                <span v-else>
+                                    <span @vue:mounted="debouncedColorUpdate(patch.color)">Загрузка...</span>
+                                </span>
+                            </div>
+                        </td>
+                        <td>{{ patch.count }}</td>
+                        <td>{{ store.usedPatches[index] || 0 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <!-- Дополнительные кнопки (печать, экспорт) -->
     <div class="field is-grouped">
